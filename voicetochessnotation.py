@@ -1,42 +1,57 @@
 import speech_recognition as sr
 from pynput.keyboard import Key, Controller
 
+import pickle
+import numpy as np
+from keras.models import load_model
+
+filename = 'machinelearning.bin'
+infile = open(filename, 'rb')
+decode_dict, encode_next_value, encode_dict, max_len_x = pickle.load(infile)
+infile.close()
+model = load_model("my_model")
+
+
+def one_hot_encode(row, max_len):
+    row = "".join(c for c in row if c in encode_dict)
+    encoding = np.zeros((1, max_len, encode_next_value), dtype=np.bool)
+    for i, c in enumerate(row):
+        v = encode_dict[c]
+        encoding[0][i][v] = 1
+    for i in range(len(row), max_len):  # padding
+        v = 0
+        encoding[0][i][v] = 1
+    return encoding
+
+
+def one_hot_decode(x):
+    return ''.join(decode_dict[c] for c in x if c != 0)
+
+
 r = sr.Recognizer()
 keyboard = Controller()
-commands = {"one": "1", "two": "2", "three": "3",
-            "four": "4", "five": "5", "six": "6", "seven": "7",
-            "eight": "8", "nine": "9", "play": "play", "cancel": "cancel",
-            "knight": "N", "night": "N", "bishop": "B", "rook": "R", "queen": "Q", "king": "K"}
-
-
-def convert_to_notation_helper(word):
-    if word in commands:
-        return commands[word]
-
-    if word[0].isdigit():
-        return word[0]
-
-    if len(word) >= 2 and word[1].isdigit():
-        return word[:2]
-    return word[0]
+commands = {"play": "play", "cancel": "cancel"}
 
 
 def convert_to_notation(response):
     for alternative in response["alternative"]:
         phrase = alternative["transcript"]
-        if phrase[0].isdigit():
-            return phrase[0]
-
+        phrase = phrase.lower()
         if phrase in commands:
             return commands[phrase]
 
     for alternative in response["alternative"]:
         phrase = alternative["transcript"]
-        words = phrase.split()
-        return "".join(convert_to_notation_helper(word.lower()) for word in words)
+        phrase = phrase.lower()
+        phrase = "".join(c for c in phrase if c.isalnum())
+        if len(phrase) > max_len_x:
+            phrase = phrase[:max_len_x]
+        phrase = one_hot_encode(phrase, max_len_x)
+        preds = model.predict_classes(phrase, verbose=0)
+        notation = one_hot_decode(preds[0])
+        return notation
 
 
-timeout = 2
 phrase_time_limit = 5
 
 with sr.Microphone() as source:
@@ -46,7 +61,7 @@ with sr.Microphone() as source:
             state = "SPEAK!"
             print(state)
             audio = r.listen(source, phrase_time_limit=phrase_time_limit)
-            response = r.recognize_google(audio, language="en-EN", show_all=True)
+            response = r.recognize_google(audio, language="en-US", show_all=True)
             print(response)
             if not response:
                 continue
@@ -55,8 +70,9 @@ with sr.Microphone() as source:
                 keyboard.press(Key.enter)
                 keyboard.release(Key.enter)
             elif c == "cancel":
-                keyboard.press(Key.backspace)
-                keyboard.release(Key.backspace)
+                for _ in range(5):
+                    keyboard.press(Key.backspace)
+                    keyboard.release(Key.backspace)
             else:
                 keyboard.type(c)
 
