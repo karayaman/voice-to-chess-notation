@@ -1,9 +1,9 @@
 import pickle
 
 pieces = {"N": ["knight", "night", "nike", "9", "nine"], "B": ["bishop"], "Q": ["queen", "quin"], "K": ["king"],
-          "": [""], "R": ["rook", "brook"]}
+          "": [""], "R": ["rook", "brook", "ruk", "rooke", "rug", "rukh", "ruke"]}
 files = {"a": ["a", "aa"], "b": ["b", "be"], "c": ["c", "ce"], "d": ["d", "de"], "e": ["e", "ee", "v"],
-         "f": ["f", "fe", "ff", "at", "s"],
+         "f": ["f", "fe", "ff", "at"],
          "g": ["g", "ge"], "h": ["h", "he", "age"], "": [""]}
 ranks = {"1": ["1", "one"], "2": ["2", "two"], "3": ["3", "three", "tree"],
          "4": ["4", "four", "fore", "for"], "5": ["5", "five"], "6": ["6", "six", "cigs", "sics"], "7": ["seven", "7"],
