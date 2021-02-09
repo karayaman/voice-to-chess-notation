@@ -60,19 +60,19 @@ class Game_state:
                       'be empty' if shouldBeEmpty else 'contain a piece',
                       " standard deviation is " + str(squareImage.std()))
                 return False
-        print("Accepted move", self.board.uci(move))
+        #print("Accepted move", self.board.uci(move))
         self.board.pop()
         return True
 
     def get_valid_move(self, potential_starts, potential_arrivals, current_chessboard_image):
-        print("Starts and arrivals:", potential_starts, potential_arrivals)
+        #print("Starts and arrivals:", potential_starts, potential_arrivals)
         if self.board.move_stack:
             previous_move = self.board.peek()
             previous_move_string = previous_move.uci()
             pre_from = previous_move_string[:2]
             pre_to = previous_move_string[2:4]
             if pre_from in potential_starts:
-                print("Fixing premove effect")
+                #print("Fixing premove effect")
                 potential_starts = potential_starts[potential_starts != pre_from]
                 # Move pre_to to back
                 if pre_to in potential_arrivals:
@@ -144,7 +144,7 @@ class Game_state:
                                                                    self.we_play_white)
 
         valid_move_string1 = self.get_valid_move(potential_starts, potential_arrivals, new_board)
-        print("Valid move string 1:" + valid_move_string1)
+        #print("Valid move string 1:" + valid_move_string1)
 
         if len(valid_move_string1) > 0:
             time.sleep(0.1)
@@ -153,7 +153,7 @@ class Game_state:
             potential_starts, potential_arrivals = get_potential_moves(self.previous_chessboard_image, new_board,
                                                                        self.we_play_white)
             valid_move_string2 = self.get_valid_move(potential_starts, potential_arrivals, new_board)
-            print("Valid move string 2:" + valid_move_string2)
+            #print("Valid move string 2:" + valid_move_string2)
             if valid_move_string2 != valid_move_string1:
                 return False, "The move has changed"
             valid_move_UCI = chess.Move.from_uci(valid_move_string1)

@@ -61,7 +61,8 @@ def start_playing(ignore=None):
             add_log("The board :\n" + str(game_state.board) + "\n")
             add_log("\nAll moves :\n" + str(game_state.executed_moves))
         else:
-            print(move)
+            pass
+            #print(move)
 
     button_start = tk.Button(text="Start playing", command=start_playing)
     button_start.grid(column=0, row=1)

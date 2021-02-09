@@ -1,16 +1,29 @@
 import pickle
+from collections import defaultdict
+from random import shuffle
 
-pieces = {"N": ["knight", "night", "nike", "9", "nine"], "B": ["bishop"], "Q": ["queen", "quin"], "K": ["king"],
-          "": [""], "R": ["rook", "brook", "ruk", "rooke", "rug", "rukh", "ruke"]}
-files = {"a": ["a", "aa"], "b": ["b", "be"], "c": ["c", "ce"], "d": ["d", "de"], "e": ["e", "ee", "v"],
+pieces = {"N": ["knight", "night", "nike", "9", "nine", "white", "flight", "light"], "B": ["bishop", "ship"],
+          "Q": ["queen", "quin", "green", "coin"],
+          "K": ["king", "kink", "pink", "can", "sync", "qing", "ping"],
+          "": [""],
+          "R": ["rook", "broke", "brook", "brooke", "ruk", "rooke", "rug", "rukh", "ruke", "route", "luke", "rup",
+                "group", "rub", "crook", "rock", "rilke", "truck", "rue", "chuck", "ruck", "struck", "stroke"]}
+files = {"a": ["a", "aa", "eye", "hey", "i"], "b": ["b", "be", "bee", "by", "me", "p"], "c": ["c", "ce", "si"],
+         "d": ["d", "de", "t", "ty", "the"],
+         "e": ["e", "ee", "v", "yv", "y"],
          "f": ["f", "fe", "ff", "at"],
-         "g": ["g", "ge"], "h": ["h", "he", "age"], "": [""]}
-ranks = {"1": ["1", "one"], "2": ["2", "two"], "3": ["3", "three", "tree"],
-         "4": ["4", "four", "fore", "for"], "5": ["5", "five"], "6": ["6", "six", "cigs", "sics"], "7": ["seven", "7"],
-         "8": ["8", "eight"]}
+         "g": ["g", "ge", "j", "ja", "ji", "gi", "qi"], "h": ["h", "he", "age", "page", "paige"], "": [""]}
+ranks = {"1": ["1", "one", "von", "mon", "onne", "wang", "wong", "wan"], "2": ["2", "two", "to", "too"],
+         "3": ["3", "three", "tree", "free"],
+         "4": ["4", "four", "fore", "for", "fool", "full", "pool"], "5": ["5", "five", "fight", "fife"],
+         "6": ["6", "six", "cigs", "sics", "stings", "sings", "tix"],
+         "7": ["seven", "7"],
+         "8": ["8", "eight"], "": [""]}
 
+extra_data = [("95", "N5"), ("changeaah", "Ka8"), ("brookepaigega", "Rhg8"),
+              ("epor", "e4"), ("ybor", "e4"), ("83", "a3"), ("84", "a4"), ("18", "a8"), ("indyto", "Qd2")]
+extra_data = []  # Don't use extra data
 data = []
-
 for piece, piece_names in pieces.items():
     for piece_name in piece_names:
         for file, file_names in files.items():
@@ -21,8 +34,21 @@ for piece, piece_names in pieces.items():
                             continue
                         for rank, rank_names in ranks.items():
                             for rank_name in rank_names:
+                                name = piece_name + file_name + file_name2 + rank_name
+                                notation = piece + file + file2 + rank
+                                if file and file2:
+                                    if piece not in ["", "N", "R"]:
+                                        continue
+                                    file_difference = abs(ord(file) - ord(file2))
+                                    file_difference_allowed = 7
+                                    if piece == "":
+                                        file_difference_allowed = 1
+                                    elif piece == "N":
+                                        file_difference_allowed = 2
+                                    if file_difference > file_difference_allowed:
+                                        continue
                                 data.append(
-                                    (piece_name + file_name + file_name2 + rank_name, piece + file + file2 + rank))
+                                    (name, notation))
 
 for piece, piece_names in pieces.items():
     for piece_name in piece_names:
@@ -36,8 +62,29 @@ for rank, rank_names in ranks.items():
     for rank_name in rank_names:
         data.append((rank_name, rank))
 
+data = list(set(data))
+
+# Always take longest notation if there are duplicate names
+longest = defaultdict(list)
+for name, notation in data:
+    longest[name].append(notation)
+
+for name in longest.keys():
+    longest[name].sort(key=lambda x: len(x), reverse=True)
+
+data = [(name, notations[0]) for name, notations in longest.items()]
+
+length_dict = defaultdict(int)
+length_data = defaultdict(list)
+for name, notation in data:
+    length_dict[len(notation)] += 1
+    length_data[len(notation)].append((name, notation))
+shuffle(length_data[4])
+length_data[4] = length_data[4][:len(length_data[3]) // 2]
+data = length_data[1] + length_data[2] + length_data[3] + length_data[4] + extra_data
 print(data)
 print(len(data))
+print(length_dict)
 filename = 'data.bin'
 outfile = open(filename, 'wb')
 pickle.dump(data, outfile)

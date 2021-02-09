@@ -4,7 +4,6 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import LSTM, TimeDistributed, RepeatVector, Dense
 from keras.callbacks import EarlyStopping
-
 from random import shuffle
 
 filename = 'data.bin'
@@ -56,7 +55,7 @@ decode_dict[0] = "*"
 x = one_hot_encode(data_x, max_len_x)
 y = one_hot_encode(data_y, max_len_y)
 
-hidden_size = 128
+hidden_size = 16
 batch_size = 128
 
 model = Sequential()
@@ -68,11 +67,11 @@ model.compile(loss='categorical_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
 
-es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=10)
+es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=20)
 history = model.fit(x, y,
-                    epochs=300,
+                    epochs=10000,
                     batch_size=batch_size,
-                    validation_split=0.4,
+                    validation_split=0.2,
                     callbacks=[es]
                     )
 
