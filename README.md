@@ -18,3 +18,4 @@ You can start using the program either pressing "Start playing (s)" button from 
 - pyautogui
 - mss
 - numpy
+- pyttsx3

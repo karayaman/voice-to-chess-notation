@@ -4,6 +4,7 @@ import tkinter as tk
 import board_basics
 from game_state_classes import *
 from voice_to_chess_notation import Voice_to_chess_notation
+import pyttsx3
 
 
 def clear_logs():
@@ -25,10 +26,15 @@ def start_playing(ignore=None):
     print(ignore)
     game_state = Game_state(voice_to_chess_notation)
     add_log("Looking for a chessboard...")
+    engine.say("Looking for a chessboard")
+    engine.runAndWait()
 
     position, we_are_white = chessboard_detection.find_chessboard()
 
     add_log("Found the chessboard " + position.print_custom())
+    engine.say("Found the chessboard")
+    engine.runAndWait()
+
     game_state.board_position_on_screen = position
 
     button_start = tk.Button(text="Stop playing", command=stop_playing)
@@ -41,9 +47,13 @@ def start_playing(ignore=None):
     game_state.we_play_white = we_are_white
     if we_are_white:
         add_log("We are white")
+        engine.say("We are white")
+        engine.runAndWait()
         game_state.moves_to_detect_before_play = 0
     else:
         add_log("We are black")
+        engine.say("We are black")
+        engine.runAndWait()
         game_state.moves_to_detect_before_play = 1
         game_state.previous_chessboard_image = chessboard_detection.read_black_chessboard()
 
@@ -64,6 +74,9 @@ def start_playing(ignore=None):
             pass
             #print(move)
 
+    engine.say("Game is over")
+    engine.runAndWait()
+
     button_start = tk.Button(text="Start playing", command=start_playing)
     button_start.grid(column=0, row=1)
 
@@ -75,7 +88,11 @@ label_title = tk.Label(text="Welcome on voice to chess notation, hope you will h
                        wraplength=300)
 label_title.grid(column=0, row=0)
 
-voice_to_chess_notation = Voice_to_chess_notation()
+engine = pyttsx3.init()
+voice_to_chess_notation = Voice_to_chess_notation(engine)
+
+engine.say("Welcome on voice to chess notation, hope you will have fun with it")
+engine.runAndWait()
 
 button_start = tk.Button(text="Start playing (s)", command=start_playing)
 button_start.grid(column=0, row=1)

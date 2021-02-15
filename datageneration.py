@@ -2,20 +2,24 @@ import pickle
 from collections import defaultdict
 from random import shuffle
 
-pieces = {"N": ["knight", "night", "nike", "9", "nine", "white", "flight", "light"], "B": ["bishop", "ship"],
-          "Q": ["queen", "quin", "green", "coin"],
-          "K": ["king", "kink", "pink", "can", "sync", "qing", "ping"],
+pieces = {"N": ["knight", "night", "nike", "9", "nine", "ninth", "white", "flight", "light", "might"],
+          "B": ["bishop", "ship"],
+          "Q": ["queen", "quin", "green", "coin", "korean"],
+          "K": ["king", "kink", "pink", "can", "sync", "qing", "ping", "change"],
           "": [""],
           "R": ["rook", "broke", "brook", "brooke", "ruk", "rooke", "rug", "rukh", "ruke", "route", "luke", "rup",
-                "group", "rub", "crook", "rock", "rilke", "truck", "rue", "chuck", "ruck", "struck", "stroke"]}
-files = {"a": ["a", "aa", "eye", "hey", "i"], "b": ["b", "be", "bee", "by", "me", "p"], "c": ["c", "ce", "si"],
-         "d": ["d", "de", "t", "ty", "the"],
-         "e": ["e", "ee", "v", "yv", "y"],
+                "group", "rub", "crook", "rock", "rilke", "truck", "rue", "chuck", "ruck", "struck", "stroke", "rogue"]}
+files = {"a": ["a", "aa", "eye", "hey", "i"], "b": ["b", "be", "bee", "by", "me", "p"], "c": ["c", "ce", "si", "sea"],
+         "d": ["d", "de", "t", "ty", "the", "tea"],
+         "e": ["e", "ee", "v", "yv", "y", "ye", "yee"],
          "f": ["f", "fe", "ff", "at"],
          "g": ["g", "ge", "j", "ja", "ji", "gi", "qi"], "h": ["h", "he", "age", "page", "paige"], "": [""]}
-ranks = {"1": ["1", "one", "von", "mon", "onne", "wang", "wong", "wan"], "2": ["2", "two", "to", "too"],
+ranks = {"1": ["1", "one", "von", "van", "mon", "onne", "wang", "wong", "wan", "ven", "vaughn"],
+         "2": ["2", "two", "to", "too", "ii"],
          "3": ["3", "three", "tree", "free"],
-         "4": ["4", "four", "fore", "for", "fool", "full", "pool"], "5": ["5", "five", "fight", "fife"],
+         "4": ["4", "four", "fore", "for", "fool", "full", "pool", "por", "poor", "force", "forth", "fault", "port",
+               "fall"],
+         "5": ["5", "five", "fight", "fife", "v"],
          "6": ["6", "six", "cigs", "sics", "stings", "sings", "tix"],
          "7": ["seven", "7"],
          "8": ["8", "eight"], "": [""]}
@@ -62,17 +66,28 @@ for rank, rank_names in ranks.items():
     for rank_name in rank_names:
         data.append((rank_name, rank))
 
-data = list(set(data))
-
 # Always take longest notation if there are duplicate names
-longest = defaultdict(list)
+# longest = defaultdict(list)
+# for name, notation in data:
+#    longest[name].append(notation)
+
+# for name in longest.keys():
+#    longest[name].sort(key=lambda x: len(x), reverse=True)
+
+
+# data = [(name, notations[0]) for name, notations in longest.items()]
+
+# Always take shortest notation if there are duplicate names
+shortest = defaultdict(list)
 for name, notation in data:
-    longest[name].append(notation)
+    shortest[name].append(notation)
 
-for name in longest.keys():
-    longest[name].sort(key=lambda x: len(x), reverse=True)
+for name in shortest.keys():
+    shortest[name].sort(key=lambda x: len(x))
 
-data = [(name, notations[0]) for name, notations in longest.items()]
+data = [(name, notations[0]) for name, notations in shortest.items()]
+
+data = list(set(data))
 
 length_dict = defaultdict(int)
 length_data = defaultdict(list)

@@ -7,15 +7,17 @@ from collections import defaultdict
 
 
 class Voice_to_chess_notation:
-    def __init__(self):
+    def __init__(self, engine):
         filename = 'machinelearning.bin'
         infile = open(filename, 'rb')
         self.decode_dict, self.encode_next_value, self.encode_dict, self.max_len_x = pickle.load(infile)
         infile.close()
         self.model = load_model("my_model")
         self.r = sr.Recognizer()
-        with sr.Microphone() as source:
-            self.r.adjust_for_ambient_noise(source)
+        # with sr.Microphone() as source:
+        #    self.r.adjust_for_ambient_noise(source)
+
+        self.engine = engine
 
     def one_hot_encode(self, row, max_len):
         row = "".join(c for c in row if c in self.encode_dict)
@@ -50,14 +52,19 @@ class Voice_to_chess_notation:
 
     def listen(self):
         phrase_time_limit = 5
-        timeout = 2
+        timeout = 10
 
         with sr.Microphone() as source:
             while True:
                 try:
+                    self.r.adjust_for_ambient_noise(source)
                     state = "SPEAK!"
                     print(state)
+                    self.engine.say(state)
+                    self.engine.runAndWait()
                     audio = self.r.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)
+                    self.engine.say("got it")
+                    self.engine.runAndWait()
                     response = self.r.recognize_google(audio, language="en-GB", show_all=True)
                     print(response)
                     if not response:
@@ -65,14 +72,20 @@ class Voice_to_chess_notation:
                     return self.convert_to_notation(response)
                 except sr.RequestError as e:
                     print("Could not request results; {0}".format(e))
+                    self.engine.say("Request Error!")
+                    self.engine.runAndWait()
                 except sr.UnknownValueError:
                     print("unknown error occured")
+                    self.engine.say("unknown error occured")
+                    self.engine.runAndWait()
                 except sr.WaitTimeoutError:
                     print("Wait time out")
+                    self.engine.say("Wait time out")
+                    self.engine.runAndWait()
 
     def play(self, board):
         epsilon = 1.0
-        decay_rate = 0.9
+        decay_rate = 0.8
         threshold = 0.2
         move_candidates = defaultdict(float)
         notations = self.listen()
